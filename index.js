@@ -8,10 +8,13 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
-	console.log('a user connected'); // if there is a connection, log it to the console. 
-	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
-		console.log('user disconnected');// if there is a disconnection, log it to the console. 
-	});
+	socket.on('chat message', function(msg){
+		console.log('message: '+ msg);
+	});// this will print it to the console... but we want to print it to the page! (broadcast it to the users)
+	//console.log('a user connected'); // if there is a connection, log it to the console. 
+	//socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
+	//	console.log('user disconnected');// if there is a disconnection, log it to the console. 
+	//});
 });
 
 http.listen(3000, function(){
