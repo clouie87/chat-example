@@ -7,6 +7,7 @@
 body{
 	font: 14px helvetica, arial; 
 	width: 100%;
+	overflow: scroll;
 }
 
 form{
@@ -15,7 +16,6 @@ form{
 	position: fixed; 
 	bottom: 0;
 	width: 100%;
-	overflow: auto;
 }
 
 form input{
@@ -31,14 +31,26 @@ form button {
 	border: none; 
 	padding: 5px; 
 }
+	#welcome {
+		color: black;
+		font-size: 14px helvetica;
+		padding-top: 3px;
+		margin: 15px;
+		border-bottom: 3px black solid;
+		height: 30px;
+	}
     #messages { 
     	list-style-type: none; 
+    	overflow-y: scroll;
     	margin: 0; 
     	padding: 0; 
     }
     #messages li { 
     	padding: 5px 10px; 
+    	overflow-y: scroll; /* this should make it autoscroll no? */
+    	clear:both;
     }
     #messages li:nth-child(odd) { 
-    	background: #eee; 
+    	background: #eee;
+    	overflow-y: scroll; 
     }
