@@ -11,10 +11,11 @@
  
   <body onload="getName()">
 
-     <p id="welcome"> Welcome, </p>
+     <p> Welcome, <span id="welcome"> </span></p>
    
 
-    
+    <input type= "text" name = "date" id="date">
+
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" placeholder="Talk to me..." /><button>Send</button>
@@ -22,15 +23,20 @@
     <script src="scripts/script.js" type="text/JavaScript"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    
     <script>
       var socket = io();
       $('form').submit(function(){
-        socket.emit('chat message', {"name": name,'msg':$('#m').val()});
-        $('#m').val('');
+        var date = new Date(); // this is a construction
+        console.log("date is " + date); // tells me what i'm looking at 
+        date = date.getHours() + " " + date.getMinutes(); // date ie: 17:45 have an issue if it is 17:2 will create an if statement soon.
+        socket.emit('chat message', {"name": name, "date": date, 'msg':$('#m').val()});
+        $('#m').val(''); // this is to clear the msg bar 
         return false;
       });
       socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg['name']+ ":" + " " + msg['msg']));
+        $('#messages').append($('<li>').text(msg['name']+ msg["date"] + " : " + msg['msg']));// submits msgs into the box and puts them below previous statements.
+        
         console.log(msg);
       });
     </script>

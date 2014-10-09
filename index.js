@@ -34,6 +34,6 @@ io.on('connection', function(socket){ // then listen to the connection event for
 	});
 });
 
-http.listen(80, function(){
-	console.log('I am on!');
+http.listen(3000, function(){
+	console.log('listening on *:3000...');
 });
