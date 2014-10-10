@@ -31,12 +31,18 @@ form button {
 	border: none; 
 	padding: 5px; 
 }
+
+p{
+	margin: 0;
+	margin-top: 15px;
+	margin-left: 15px;
+	border-bottom: 3px solid black;
+	font: 14px helvetica, arial;
+	height: 19px;
+}
+
 	#welcome {
-		color: black;
-		font-size: 14px helvetica;
-		padding-top: 3px;
-		margin: 15px;
-		border-bottom: 3px black solid;
+		margin-left: -1px;
 		height: 30px;
 	}
     #messages { 
@@ -44,6 +50,7 @@ form button {
     	overflow-y: scroll;
     	margin: 0; 
     	padding: 0; 
+    	margin-bottom: 60px;
     }
     #messages li { 
     	padding: 5px 10px; 
