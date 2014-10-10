@@ -11,3 +11,4 @@ function getName(){
 	console.log("Welcome" + name + "!");// this lets me see it on my console. 
 };
 
+
