@@ -5,6 +5,14 @@ var app = express();// originally var app = require('express')(); which i think 
 var http = require('http').Server(app);
 var io= require('socket.io')(http); //after downloading the socket.io we need to state the var we initialize the (socket.io)
 //and pass it through the http object
+var redis = require("redis");
+var client = redis.createClient();
+
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
+
+client.set("app name", "simple chat", redis.print); // we set a key for app name here which we get on line 30
 
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
@@ -18,12 +26,10 @@ app.use('/styles', express.static(__dirname +'/styles'));
 
 app.use('/scripts', express.static(__dirname +'/scripts'));
 
-app.use(function (req, res, next) {
-	console.log('Time: %d', Date.now());
-	next();
-});
-
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
+	client.get("app name", function(err, reply){ //we get the key value and print it to the console. 
+	console.log("app name is: " + reply)
+	});
 	socket.on('chat message', function(msg){
 		io.emit('chat message', msg);
 		console.log('message: '+ msg);
@@ -36,4 +42,4 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 http.listen(3000, function(){
 	console.log('listening on *:3000...');
-});
+}); 
