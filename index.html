@@ -30,6 +30,7 @@
       socket.on('connect', function(){// listen for when someone is connected to the server
         name = prompt('What is your name?');
         socket.emit('join', name); //notifys the server of the users nickname
+        return false;
       });
 
       $('form').submit(function(){
