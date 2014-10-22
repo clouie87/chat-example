@@ -28,16 +28,23 @@ app.use('/scripts', express.static(__dirname +'/scripts'));
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
 	client.get("app name", function(err, reply){ //we get the key value and print it to the console. 
-	console.log("app name is: " + reply)
+		console.log("app name is: " + reply);
 	});
+	client.get('last message', function(err, reply){
+		console.log("last message: ", reply);
+	});
+
+	console.log('a user connected'); // if there is a connection, log it to the console. 
+	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
+	console.log('user disconnected');// if there is a disconnection, log it to the console. 
+	});
+
 	socket.on('chat message', function(msg){
-		io.emit('chat message', msg);
-		console.log('message: '+ msg);
-	});// this will print it to the console... but we want to print it to the page! (broadcast it to the users)
-		console.log('a user connected'); // if there is a connection, log it to the console. 
-		socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
-		console.log('user disconnected');// if there is a disconnection, log it to the console. 
-	});
+		console.log('the message is: ' + msg);
+		socket.broadcast.emit('chat message', msg);
+		client.set('last message', msg);// to store the message
+	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
+	
 });
 
 http.listen(3000, function(){
