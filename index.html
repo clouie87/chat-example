@@ -30,7 +30,7 @@
       socket.on('connect', function(){// listen for when someone is connected to the server
         name = prompt('What is your name?');
         socket.emit('join', name); //notifys the server of the users nickname
-        return false;
+ 
       });
 
       $('form').submit(function(){
@@ -43,7 +43,7 @@
         };*/
 
         socket.emit('chat message', $('#m').val()); //{"name": name, "date": date, 'msg':$('#m').val()});
-        var message = $('#m').val();
+        var msg = $('#m').val();
         $('#messages').append($('<li>').text(msg));
         //$('#m').val(''); // this is to clear the msg bar 
         return false;
