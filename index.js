@@ -7,6 +7,7 @@ var io= require('socket.io')(http); //after downloading the socket.io we need to
 //and pass it through the http object
 var redis = require("redis");
 var client = redis.createClient();
+var userCount = 0;
 
 client.on("error", function (err) {
     console.log("Error " + err);
@@ -27,24 +28,33 @@ app.use('/styles', express.static(__dirname +'/styles'));
 app.use('/scripts', express.static(__dirname +'/scripts'));
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
+	userCount = userCount+1;
+	console.log("Someone connected there are", userCount, "users");
+
+	socket.emit("connect");
+	socket.on('join', function(data){
+		console.log("name: ", data);
+	});
+
 	client.get("app name", function(err, reply){ //we get the key value and print it to the console. 
 		console.log("app name is: " + reply);
 	});
+
 	client.get('last message', function(err, reply){
 		console.log("last message: ", reply);
-	});
-
-	console.log('a user connected'); // if there is a connection, log it to the console. 
-	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
-	console.log('user disconnected');// if there is a disconnection, log it to the console. 
+		socket.emit('history', reply);
 	});
 
 	socket.on('chat message', function(msg){
 		console.log('the message is: ' + msg);
-		socket.broadcast.emit('chat message', msg);
+		socket.emit('chat message', msg);
 		client.set('last message', msg);// to store the message
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
-	
+
+	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
+		userCount = userCount-1;
+		console.log("Someone disconnected there are", userCount, "users");// if there is a disconnection, log it to the console.
+	});
 });
 
 http.listen(3000, function(){

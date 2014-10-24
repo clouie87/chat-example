@@ -27,36 +27,41 @@
     <script>
       var socket = io();
 
-      socket.on('connect', function(){// listen for when someone is connected to the server
+      var name = "";
+      socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
         name = prompt('What is your name?');
-        socket.emit('join', name); //notifys the server of the users nickname
- 
+        socket.emit('join', name); //notifys the server of
       });
 
       $('form').submit(function(){
-        /*var date = new Date(); // this is a construction
+        var date = new Date(); // this is a construction
         console.log("date is " + date); // tells me what i'm looking at 
         if(date.getMinutes() < 10){ // because if the time was 1:02 it would return 1:2 I created an if/else to add in proper display!
           date = date.getHours() + ":0" + date.getMinutes();
         }else{
           date = date.getHours() + ":" + date.getMinutes();
-        };*/
+        };
 
-        socket.emit('chat message', $('#m').val()); //{"name": name, "date": date, 'msg':$('#m').val()});
+        socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
         var msg = $('#m').val();
-        $('#messages').append($('<li>').text(msg));
-        //$('#m').val(''); // this is to clear the msg bar 
+        //$('#messages').append($('<li>').text(msg));
+        //$('#m').val(''); // this is to clear the msg bar
         return false;
       });
 
       
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
+
         $('body').animate({
             scrollTop: $('body').height()
           }, "slow");
         
         console.log(msg);
+      });
+
+      socket.on('history', function(msg){
+        $('#messages').append($('<li>').text(msg));
       });
     </script>
 
