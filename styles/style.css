@@ -35,21 +35,32 @@ form button {
 p{
 	margin: 0;
 	margin-top: 15px;
-	margin-left: 15px;
 	border-bottom: 3px solid black;
 	font: 14px helvetica, arial;
-	height: 19px;
 }
+
+	#users{
+		height: 600px;
+		width: 9%;
+		border: 3px black solid;
+		background-color: darkseagreen;
+		float: left;
+		text-align: center;
+
+	}
 
 	#welcome {
 		margin-left: -1px;
 		height: 30px;
 	}
-    #messages { 
-    	list-style-type: none; 
-    	overflow-y: scroll;
+
+    #messages {
+		float: right;
+		width: 90%;
+    	list-style-type: none;
+    	overflow: scroll;
     	margin: 0; 
-    	padding: 0; 
+    	padding: 0;
     	margin-bottom: 60px;
     }
     #messages li { 

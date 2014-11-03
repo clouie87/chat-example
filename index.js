@@ -4,9 +4,11 @@ var express = require('express');
 var app = express();// originally var app = require('express')(); which i think sums up line 3 and 4 but we need the var express if i want to add in my own js. 
 var http = require('http').Server(app);
 var io= require('socket.io')(http); //after downloading the socket.io we need to state the var we initialize the (socket.io)
-//and pass it through the http object
+//and pass it through the http object\
 var redis = require("redis");
+
 var client = redis.createClient();
+
 var userCount = 0;
 
 client.on("error", function (err) {
@@ -40,15 +42,15 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		console.log("app name is: " + reply);
 	});
 
-	client.get('last message', function(err, reply){
-		console.log("last message: ", reply);
-		socket.emit('history', reply);
-	});
-
 	socket.on('chat message', function(msg){
 		console.log('the message is: ' + msg);
-		socket.emit('chat message', msg);
-		client.set('last message', msg);// to store the message
+		io.emit('chat message', msg);
+		//client.rpush('history', msg);// to store the message
+
+		/*client.lrange('history', 0, 10, function(err, reply){
+			console.log("history: ", reply);
+			socket.emit('history', reply);
+		});*/
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
 
 	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
