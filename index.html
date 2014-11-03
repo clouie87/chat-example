@@ -62,8 +62,14 @@
         console.log(msg);
       });
 
-      socket.on('history', function(msg){
 
+      socket.on('history', function(msgs){
+        if (msgs === null){
+          return false;
+        };
+        for(i=0; i < msgs.length; i++) {
+          $('#messages').append($('<li>').text(msgs[i]));
+        };
       });
     </script>
 
