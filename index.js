@@ -8,7 +8,6 @@ var io= require('socket.io')(http); //after downloading the socket.io we need to
 var redis = require("redis");
 
 var client = redis.createClient();
-client.lpush('history', 'hey tomek!');
 
 var userCount = 0;
 
@@ -37,9 +36,9 @@ io.on('connection', function(socket){ // then listen to the connection event for
 	socket.emit("connect");
 
 	socket.on('join', function(data){
-		client.lrange('history', 0, -1, function(err, history){
+		client.lrange('history', 0, 9, function(err, history){ // when a new client joins we want to print the history
 			console.log("history: ", history);
-			socket.emit('history', history);
+			socket.emit('history', history); // emit it to all users (but will only be sent to the new connection!)
 		});
 		console.log("name: ", data);
 	});
@@ -51,7 +50,9 @@ io.on('connection', function(socket){ // then listen to the connection event for
 	socket.on('chat message', function(msg){
 		console.log('the message is: ' + msg);
 		io.emit('chat message', msg);
-		client.lpush('history', msg);// to store the message
+		client.lpush('history', msg, function(err, history){
+			console.log(history);
+		});// to store the message
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
 
 	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket

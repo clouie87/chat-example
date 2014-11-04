@@ -67,7 +67,7 @@
         if (msgs === null){
           return false;
         };
-        for(i=0; i < msgs.length; i++) {
+        for(i = msgs.length; i > -1; i--) {
           $('#messages').append($('<li>').text(msgs[i]));
         };
       });
