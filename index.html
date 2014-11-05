@@ -14,7 +14,7 @@
      <p>Welcome,<span id="welcome"> </span></p>
   <div id="users">
     <p> Users</p>
-
+    <ul id="user"> </ul>
   </div>
 
     <ul id="messages"></ul>
@@ -34,7 +34,7 @@
       var name = "";
       socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
         name = prompt('What is your name?');
-        socket.emit('join', name); //notifys the server of
+        socket.emit('join', name); //notifies the server of new user
       });
 
       $('form').submit(function(){
@@ -57,11 +57,22 @@
 
         $('body').animate({
             scrollTop: $('body').height()
-          }, "slow");
+          }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
 
         console.log(msg);
       });
 
+      socket.on('username', function(username){
+        //socket.broadcast.emit('username', username);
+        //if(username === null){
+       // return false;
+       // };
+        //name = JSON.parse();
+        //io.emit('username', username);
+        for(i = 0; i < username.length; i++) {
+          $('#user').append($('<div>').text(username[i]));
+        };
+      });
 
       socket.on('history', function(msgs){
         if (msgs === null){

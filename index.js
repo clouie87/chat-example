@@ -15,6 +15,8 @@ client.on("error", function (err) {
     console.log("Error " + err);
 });
 
+client.del('username');
+
 client.set("app name", "simple chat", redis.print); // we set a key for app name here which we get on line 30
 
 app.get('/', function(req, res){
@@ -35,12 +37,25 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 	socket.emit("connect");
 
-	socket.on('join', function(data){
+	socket.on('join', function(name){
+		io.emit('username', name);
+		//socket.broadcast()
+		//io.emit('name', name);
+		client.lrange('username', 0, -1, function(err, username){
+			//name = JSON.parse(name);
+			console.log("username: ", username);
+			socket.emit('username', username);
+		});
+		io.emit('name', name);
+		client.lpush('username', name, function(err, username){
+			//io.emit('username', username);
+			console.log(username);
+		});
+
 		client.lrange('history', 0, 9, function(err, history){ // when a new client joins we want to print the history
 			console.log("history: ", history);
 			socket.emit('history', history); // emit it to all users (but will only be sent to the new connection!)
 		});
-		console.log("name: ", data);
 	});
 
 	client.get("app name", function(err, reply){ //we get the key value and print it to the console.
@@ -52,7 +67,7 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		io.emit('chat message', msg);
 		client.lpush('history', msg, function(err, history){
 			console.log(history);
-		});// to store the message
+		}); //to store the message
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
 
 	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
