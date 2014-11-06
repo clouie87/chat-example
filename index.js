@@ -12,7 +12,7 @@ var client = redis.createClient();
 var userCount = 0;
 
 client.on("error", function (err) {
-    console.log("Error " + err);
+	console.log("Error " + err);
 });
 
 client.del('username');
@@ -33,23 +33,23 @@ app.use('/scripts', express.static(__dirname +'/scripts'));
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
 	userCount = userCount+1;
+	var currentUsername = "";
 	console.log("Someone connected there are", userCount, "users");
 
 	socket.emit("connect");
 
 	socket.on('join', function(name){
-		io.emit('username', name);
-		//socket.broadcast()
-		//io.emit('name', name);
-		client.lrange('username', 0, -1, function(err, username){
-			//name = JSON.parse(name);
-			console.log("username: ", username);
-			socket.emit('username', username);
-		});
-		io.emit('name', name);
-		client.lpush('username', name, function(err, username){
-			//io.emit('username', username);
+		currentUsername = name; // assign the user a Username in the local memory
+		socket.emit('name', name);
+		client.lpush('username', name, function(err, username){ // we want to push the name value onto the list 'username'
 			console.log(username);
+		});
+
+		client.lrange('username', 0, -1, function(err, username){ //then we retrieve the list and print it out
+			io.emit('username', username); //io.emit so it gets sent to all the users (including the person that joined
+			//socket.broadcast.emit('username', username);
+			console.log("the current users are: ", username);
+			//socket.emit('username', username);
 		});
 
 		client.lrange('history', 0, 9, function(err, history){ // when a new client joins we want to print the history
@@ -71,6 +71,13 @@ io.on('connection', function(socket){ // then listen to the connection event for
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
 
 	socket.on('disconnect', function(){ // listen to people disconnection events for outgoing socket
+		client.lrem('username', 1, currentUsername);// remove the client that is disconnecting
+		client.lrange('username', 0, -1, function(err, username){ // reprint the list to account for the person that disconnected
+			io.emit('username', username);
+			//socket.broadcast.emit('username', username);
+			console.log("the current users are: ", username);
+			//socket.emit('username', username);
+		});
 		userCount = userCount-1;
 		console.log("Someone disconnected there are", userCount, "users");// if there is a disconnection, log it to the console.
 	});

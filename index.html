@@ -1,88 +1,77 @@
+
 <!doctype html>
 <html>
-  <head>  
-    <link type= "text/css" rel= "stylesheet" href="styles/style.css" />
+<head>
+  <link type= "text/css" rel= "stylesheet" href="styles/style.css" />
 
 
-    <title>Socket.IO chat</title>
+  <title>Socket.IO chat</title>
 
-    </head>
-  <script src="scripts/script.js" type="text/JavaScript"></script>
- 
-  <body> <!--onload="getName()"-->
+</head>
+<script src="scripts/script.js" type="text/JavaScript"></script>
 
-     <p>Welcome,<span id="welcome"> </span></p>
-  <div id="users">
-    <p> Users</p>
-    <ul id="user"> </ul>
-  </div>
+<body> <!--onload="getName()"-->
 
-    <ul id="messages"></ul>
+<p>Welcome,<span id="welcome"> </span></p>
+<div id="users">
+  <p> Users</p>
+  <ul id="user"> </ul>
+</div>
 
-    <form action="">
-      <input id="m" autocomplete="off" placeholder="Talk to me..." /><button>Send</button>
+<ul id="messages"></ul>
 
-    </form>
-    
-    <script src="scripts/script.js" type="text/JavaScript"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    
-    <script>
-      var socket = io();
+<form action="">
+  <input id="m" autocomplete="off" placeholder="Talk to me..." /><button>Send</button>
 
-      var name = "";
-      socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
-        name = prompt('What is your name?');
-        socket.emit('join', name); //notifies the server of new user
-      });
+</form>
 
-      $('form').submit(function(){
-        var date = new Date(); // this is a construction
-        console.log("date is " + date); // tells me what i'm looking at
-        if(date.getMinutes() < 10){ // because if the time was 1:02 it would return 1:2 I created an if/else to add in proper display!
-          date = date.getHours() + ":0" + date.getMinutes();
-        }else{
-          date = date.getHours() + ":" + date.getMinutes();
-        };
+<script src="scripts/script.js" type="text/JavaScript"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
-        socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
-        var msg = $('#m').val();
-        $('#m').val(''); // this is to clear the msg bar
-        return false;
-      });
+<script>
+  var socket = io();
+  var name = "";
+  socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
+    name = prompt('What is your name?');
+    socket.emit('join', name); //notifies the server of new user
+  });
+  $('form').submit(function(){
+    var date = new Date(); // this is a construction
+    console.log("date is " + date); // tells me what i'm looking at
+    if(date.getMinutes() < 10){ // because if the time was 1:02 it would return 1:2 I created an if/else to add in proper display!
+      date = date.getHours() + ":0" + date.getMinutes();
+    }else{
+      date = date.getHours() + ":" + date.getMinutes();
+    };
+    socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
+    var msg = $('#m').val();
+    $('#m').val(''); // this is to clear the msg bar
+    return false;
+  });
+  socket.on('chat message', function(msg) {
+    $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
+    $('body').animate({
+      scrollTop: $('body').height()
+    }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
+    console.log(msg);
+  });
+  socket.on('username', function(username){
+    $('#user').html(" "); //this clears the html in the user element and reloads :)
+    for(i = username.length; i > -1; i--) {
+      $('#user').append($('<div>').text(username[i]));
+      //socket.emit('username', username[i]);
+    };
+  });
+  socket.on('history', function(msgs){
+    if (msgs === null){
+      return false;
+    };
+    for(i = msgs.length; i > -1; i--) {
+      $('#messages').append($('<li>').text(msgs[i]));
+    };
+  });
+</script>
 
-      socket.on('chat message', function(msg) {
-        $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
-
-        $('body').animate({
-            scrollTop: $('body').height()
-          }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
-
-        console.log(msg);
-      });
-
-      socket.on('username', function(username){
-        //socket.broadcast.emit('username', username);
-        //if(username === null){
-       // return false;
-       // };
-        //name = JSON.parse();
-        //io.emit('username', username);
-        for(i = 0; i < username.length; i++) {
-          $('#user').append($('<div>').text(username[i]));
-        };
-      });
-
-      socket.on('history', function(msgs){
-        if (msgs === null){
-          return false;
-        };
-        for(i = msgs.length; i > -1; i--) {
-          $('#messages').append($('<li>').text(msgs[i]));
-        };
-      });
-    </script>
-
-  </body>
+</body>
 </html>
