@@ -24,7 +24,16 @@
 
   <div id="rooms">
     <p> Rooms</p>
-    <ul class = 'room'></ul>
+    <input type='button' value="create a new room"/>
+
+    <ul class = 'room'>
+      <!--<li><a href="/room1.html">Find a Partner</a></li>
+      <li> <a href="/room2.html">Find Equipment</a></li>
+      <li><a href="/room3.html">Find a Ride</a></li> -->
+      <li><input type="button" id= "newPartner" class= 'roomButton' value="Find a Partner" /></li>
+      <li><input type="button" id="equipment" class= 'roomButton' value="Find Equipment" /> </li>
+      <li><input type="button" id="carShare" class= 'roomButton' value = "Find a Ride" /></li>
+    </ul>
   </div>
 
 <div id="messageBox">
@@ -45,11 +54,20 @@
 
 <script>
   var socket = io();
+
   var name = "";
+
+  var room = io.connect('/room');
+  $('.roomButton').click(function(){
+    var roomName = $(this).val(); //create a selector on the value name in the input so onclick we
+    socket.emit('switchRoom', roomName);
+  }); // this means we check the current selected element (so this case we are getting the value which was defined in the input tag)
+
   socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
     name = prompt('What is your name?');
     socket.emit('join', name); //notifies the server of new user
   });
+
   $('form').submit(function(){
     var date = new Date(); // this is a construction
     console.log("date is " + date); // tells me what i'm looking at
@@ -65,8 +83,8 @@
   });
   socket.on('chat message', function(msg) {
     $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
-    $('#container').animate({
-      scrollTop: $('#container').height()
+    $('#messages').animate({
+      scrollTop: $('#messages').height()
     }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
     console.log(msg);
   });
@@ -78,6 +96,7 @@
     };
   });
   socket.on('history', function(msgs){
+    $('#messages').html(" ");
     if (msgs === null){
       return false;
     };
