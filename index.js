@@ -33,27 +33,29 @@ app.use('/scripts', express.static(__dirname +'/scripts'));
 
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
-	var room = ' ';
+	var room = '';
 
 	userCount = userCount+1;
 	var currentUsername = "";
 	console.log("Someone connected there are", userCount, "users");
-	socket.emit("connect");
+
+	client.lrange('username', 0, -1, function(err, usernames){ //then we retrieve the list and print it out
+		io.to(room).emit('username', usernames); //io.emit so it gets sent to all the users (including the person that joined
+		//socket.broadcast.emit('username', username);
+		console.log("the current users are: ", usernames);
+		//socket.emit('username', username);
+		socket.emit("users",usernames);
+	});
 
 	socket.on('join', function(name){
 		socket.join(room);
 		currentUsername = name; // assign the user a Username in the local memory
-		socket.emit('name', name);
-		client.lpush('username', name, function(err, username){ // we want to push the name value onto the list 'username'
-			console.log(username);
+		client.lpush('username', name, function(err, length){ // we want to push the name value onto the list 'username'
+			console.log("length:",length);
+			socket.emit("joined",name);
 		});
 
-		client.lrange('username', 0, -1, function(err, username){ //then we retrieve the list and print it out
-			io.to(room).emit('username', username); //io.emit so it gets sent to all the users (including the person that joined
-			//socket.broadcast.emit('username', username);
-			console.log("the current users are: ", username);
-			//socket.emit('username', username);
-		});
+
 // in redis we will keep the history plus the room name so that we know which room the msg was sent from and can send back to newUsers on connection
 		client.lrange('history'+ room, 0, 9, function(err, history){ // when a new client joins we want to print the history
 			console.log("history: " + room, history);
@@ -61,13 +63,22 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		});//socket.emit goes only to the user connected so we dont need to use to(room) because we dont care which room he is in, regardless he needs the history
 	});
 
+	socket.on("createRoom", function(roomName){
+		console.log("roomName has been created:", roomName);
+		socket.join(roomName);
+		socket.leave(room);
+		room = roomName;
+		io.emit("createdRoom", room);
+	});
+
 	socket.on('switchRoom', function(newRoom){ //listen for switching of rooms
 		socket.leave(room);
 		socket.join(newRoom);
 		room = newRoom; //this is the new room
 		//keep separate histories for separate rooms
-		client.lrange('history'+ room, 0, 9, function(err, history){ // when a new client joins we want to print the history
-			console.log("history: " + room, history);
+		var history = "history"+room;
+		console.log("new switch history:",history);
+		client.lrange(history, 0, 9, function(err, history){ // when a new client joins we want to print the history
 			socket.emit('history', history); // emit it to all users (but will only be sent to the new connection!)
 		});
 	});

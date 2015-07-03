@@ -3,9 +3,9 @@
 <html>
 <head>
   <link type= "text/css" rel= "stylesheet" href="styles/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
 
-
-  <title>Socket.IO chat</title>
+  <title>Revelstoke</title>
 
 </head>
 <script src="scripts/script.js" type="text/JavaScript"></script>
@@ -13,7 +13,8 @@
 
 <body> <!--onload="getName()"-->
 <header>
-  <h2>Adventure Chat</h2>
+  <h2>Revelstoke</h2>
+  <h4>The Climbing Chat App</h4>
 </header>
 
 <div id = container>
@@ -24,48 +25,106 @@
 
   <div id="rooms">
     <p> Rooms</p>
-    <input type='button' value="create a new room"/>
+    <!--<input class="waves-effect waves-light btn" value="create a room"/>-->
+    <!--<input type='button' value="create a new room"/>-->
 
-    <ul class = 'room'>
+    <ul class='createRoom'>
       <!--<li><a href="/room1.html">Find a Partner</a></li>
       <li> <a href="/room2.html">Find Equipment</a></li>
       <li><a href="/room3.html">Find a Ride</a></li> -->
+      <li>
+        <form class="col s12">
+          <div class="input-field col s10">
+            <input placeholder="Create a new room" id="custom-room-name" type="text" />
+          </div>
+        </form>
+
+        <!--<input type="text" id= "custom-room-name" placeholder="Room Name"/></li>-->
+      <li><input class="waves-effect waves-light btn createButton" onclick="createRoom()" value="Create Room" /></li>
+
+      <br/>
+      <!--<li><input type="button" id="create-room" class= 'createButton' onclick="createRoom()" value="Create Room"/></li>-->
       <li><input type="button" id= "newPartner" class= 'roomButton' value="Find a Partner" /></li>
       <li><input type="button" id="equipment" class= 'roomButton' value="Find Equipment" /> </li>
-      <li><input type="button" id="carShare" class= 'roomButton' value = "Find a Ride" /></li>
+      <li><input type="button" id="carShare" class= 'roomButton' value ="Find a Ride" /></li>
+
+      <div id="custom-rooms"></div>
+      <li></li>
     </ul>
   </div>
 
 <div id="messageBox">
+  <h4></h4>
   <section>
     <ul id="messages"></ul>
   </section>
+
   <section id="form">
-    <form action="">
-      <input id="m" autocomplete="off" placeholder="Talk to me..." /><button>Send</button>
+    <form class = "col s12">
+      <div class="row input">
+        <div class="input-field col s10">
+          <input placeholder="Rock on..." id="m" type="text" />
+        </div>
+        <div class="col s2">
+          <button class="waves-effect waves-light btn send">Send</button>
+        </div>
+      </div>
     </form>
+
+  <br/>
+
   </section>
   </div>
 </div>
 
 <script src="scripts/script.js" type="text/JavaScript"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="/scripts/jquery-2.1.1.js"></script>
 
 <script>
   var socket = io();
 
   var name = "";
 
-  var room = io.connect('/room');
-  $('.roomButton').click(function(){
-    var roomName = $(this).val(); //create a selector on the value name in the input so onclick we
-    socket.emit('switchRoom', roomName);
-  }); // this means we check the current selected element (so this case we are getting the value which was defined in the input tag)
+  var createRoom= function(){
+    var roomName = $("#custom-room-name").val();
+    $('#custom-room-name').val('');
+    socket.emit("createRoom", roomName);
+  };
 
-  socket.on('connect', function(){// listen for when someone is connected to the server the users nickname
+  socket.on('createdRoom', function(room){
+    var roomBtn = $('<input class="roomButton">');
+    roomBtn.val(room);
+    roomBtn.attr("type","button");
+    roomBtn.click(function(){
+      console.log(room,"clicked");
+      switchRoom(room)
+    });
+
+    $('#custom-rooms').append($('<li>').append(roomBtn));
+  });
+
+  var room = io.connect('/room');
+
+  var switchRoom = function(rmname){
+      var roomName = rmname;     //create a selector on the value name in the input so onclick we
+      socket.emit('switchRoom', roomName);
+    };
+
+  $('.roomButton').click(function() {
+      var rName = $(this).val();
+      switchRoom(rName);
+    }
+  ); // this means we check the current selected element (so this case we are getting the value which was defined in the input tag)
+
+  socket.on('users', function(users){// listen for when someone is connected to the server the users nickname
+    for(i = users.length; i > -1; i--) {
+      $('#user').append($('<div>').text(users[i]));
+      //socket.emit('username', username[i]);
+    }
     name = prompt('What is your name?');
     socket.emit('join', name); //notifies the server of new user
+
   });
 
   $('form').submit(function(){
@@ -88,12 +147,13 @@
     }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
     console.log(msg);
   });
-  socket.on('username', function(username){
-    $('#user').html(" "); //this clears the html in the user element and reloads :)
+  socket.on('joined', function(username){
+    $('#user').append($('<div>').text(username));
+   /* $('#user').html(" "); //this clears the html in the user element and reloads :)
     for(i = username.length; i > -1; i--) {
       $('#user').append($('<div>').text(username[i]));
       //socket.emit('username', username[i]);
-    };
+    };*/
   });
   socket.on('history', function(msgs){
     $('#messages').html(" ");
