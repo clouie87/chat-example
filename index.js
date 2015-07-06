@@ -1,7 +1,7 @@
 //resource: http://expressjs.com/4x/api.html#application
 
 var express = require('express');
-var app = express();// originally var app = require('express')(); which i think sums up line 3 and 4 but we need the var express if i want to add in my own js. 
+var app = express();// originally var app = require('express')(); which i think sums up line 3 and 4 but we need the var express if i want to add in my own js.
 var http = require('http').Server(app);
 var io= require('socket.io')(http); //after downloading the socket.io we need to state the var we initialize the (socket.io)
 //and pass it through the http object\
@@ -23,6 +23,8 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
+
+
 app.get('/', function (req, res){
 	res.send('Welcome');
 });
@@ -37,6 +39,7 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 	userCount = userCount+1;
 	var currentUsername = "";
+
 	console.log("Someone connected there are", userCount, "users");
 
 	client.lrange('username', 0, -1, function(err, usernames){ //then we retrieve the list and print it out
@@ -89,6 +92,10 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 	socket.on('chat message', function(msg){
 		console.log('the message is: ' + msg);
+    console.log('sound');
+    var audio = "sound";
+    socket.emit('play', audio);
+
 		io.to(room).emit('chat message', msg);
 		client.lpush('history' + room, msg, function(err, history){
 			console.log(history);
@@ -110,4 +117,4 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 http.listen(3000, function(){
 	console.log('listening on *:3000...');
-}); 
+});

@@ -20,7 +20,19 @@ h2{
 h4 {
   text-align: center;
 }
+.card {
+  background: url("rock1@2x.jpg") no-repeat;
+  height: 663px;
+}
+.col .m3 {
+  background: rgba(74, 74, 74, 0.5);
+  height: 100%;
 
+}
+
+/*.col .m6 {*/
+  /**/
+/*}*/
 ul{
 	list-style-type: none;
 }
@@ -34,15 +46,6 @@ p{
 	font-size: 20px;
 
 	text-align: center;
-}
-
-#container{
-	border: 3px solid gray;
-	height: 90%;
-	width: 100%;
-  background: url("rock1@2x.png") no-repeat;
-  overflow: hidden;
-
 }
 
 	#users{
@@ -59,6 +62,7 @@ p{
   #custom-rooms{
     background-color: transparent;
   }
+
 	#rooms{
 		height: 100%;
 		color: white;
@@ -90,8 +94,9 @@ p{
 
 
   .send {
-    padding: 0 3rem !important;
-    /*padding: 0 2rem !important;*/
+    padding: 0 2.8rem !important;
+    /*margin-left: 20px;*/
+    margin-top: 20px;
     font-family: roboto-thin !important;
     font-size: 16px;
   }
@@ -103,11 +108,9 @@ p{
 #messageBox{
 		float: left;
 		height: 90%;
-		width: 70%;
 	}
 
 	#form{
-		/*margin-top: -10px;*/
 		position: relative;
 
 		width: 100%;
@@ -116,14 +119,14 @@ p{
     margin-top: 10px !important;
   }
   .input{
-    border: 2px solid #2bbbad;
     background: rgba(255, 255, 255, 0.2);
     color: black;
   }
 
 
     #messages {
-		height: 663px;
+		height: 480px;
+      width: 100%;
     	list-style-type: none;
     	overflow: scroll;
     	margin: 2px;
@@ -143,8 +146,7 @@ p{
     }
 
     #m {
-      /*height: 78px !important;*/
-      margin-top: -20px;
+
       margin-left: 20px;
       /*margin-right: 20px;*/
 

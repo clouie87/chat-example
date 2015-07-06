@@ -17,63 +17,67 @@
   <h4>The Climbing Chat App</h4>
 </header>
 
-<div id = container>
-  <div id="users">
-    <p> Users</p>
-    <ul id="user"> </ul>
-  </div>
+<div class="row">
+  <div class="col m12">
+    <div class="card white-text">
 
-  <div id="rooms">
-    <p> Rooms</p>
-    <!--<input class="waves-effect waves-light btn" value="create a room"/>-->
-    <!--<input type='button' value="create a new room"/>-->
-
-    <ul class='createRoom'>
-      <!--<li><a href="/room1.html">Find a Partner</a></li>
-      <li> <a href="/room2.html">Find Equipment</a></li>
-      <li><a href="/room3.html">Find a Ride</a></li> -->
-      <li>
-        <form class="col s12">
-          <div class="input-field col s10">
-            <input placeholder="Create a new room" id="custom-room-name" type="text" />
-          </div>
-        </form>
-
-        <!--<input type="text" id= "custom-room-name" placeholder="Room Name"/></li>-->
-      <li><input class="waves-effect waves-light btn createButton" onclick="createRoom()" value="Create Room" /></li>
-
-      <br/>
-      <!--<li><input type="button" id="create-room" class= 'createButton' onclick="createRoom()" value="Create Room"/></li>-->
-      <li><input type="button" id= "newPartner" class= 'roomButton' value="Find a Partner" /></li>
-      <li><input type="button" id="equipment" class= 'roomButton' value="Find Equipment" /> </li>
-      <li><input type="button" id="carShare" class= 'roomButton' value ="Find a Ride" /></li>
-
-      <div id="custom-rooms"></div>
-      <li></li>
-    </ul>
-  </div>
-
-<div id="messageBox">
-  <h4></h4>
-  <section>
-    <ul id="messages"></ul>
-  </section>
-
-  <section id="form">
-    <form class = "col s12">
-      <div class="row input">
-        <div class="input-field col s10">
-          <input placeholder="Rock on..." id="m" type="text" />
+        <div class="col m3 center"><br><h5>Users</h5>
+        <hr>
+          <ul id="user"> </ul>
         </div>
-        <div class="col s2">
-          <button class="waves-effect waves-light btn send">Send</button>
+
+        <div class="col m6"><br><h5 id ="RoomName" class="center" value="General">General</h5>
+
+        <hr>
+          <section>
+            <ul id="messages" class="left black-text"></ul>
+          </section>
+
+          <section id="form">
+            <form class = "col s12">
+              <div class="row input">
+                <div class="input-field col s9">
+                  <input placeholder="Rock on..." id="m" type="text" />
+                </div>
+                <div class="col s3">
+                  <button class="waves-effect waves-light btn send right">Send</button>
+                </div>
+              </div>
+            </form>
+
+            <br/>
+
+          </section>
         </div>
+
+        <div class="col m3 center"><br><h5>Rooms</h5>
+        <hr>
+          <ul class='col s12 center createRoom'>
+
+            <li>
+              <form class="col s8 offset-s2">
+                <div class="input-field">
+                  <input placeholder="Create a new room" id="custom-room-name" type="text" />
+                </div>
+              </form>
+            </li>
+
+              <!--<input type="text" id= "custom-room-name" placeholder="Room Name"/></li>-->
+            <li><input class="waves-effect waves-light btn createButton" onclick="createRoom()" value="Create Room" /></li>
+
+            <br/>
+            <!--<li><input type="button" id="create-room" class= 'createButton' onclick="createRoom()" value="Create Room"/></li>-->
+            <li><input type="button" id= "newPartner" class= 'roomButton' value="Find a Partner" /></li>
+            <li><input type="button" id="equipment" class= 'roomButton' value="Find Equipment" /> </li>
+            <li><input type="button" id="carShare" class= 'roomButton' value ="Find a Ride" /></li>
+
+            <div id="custom-rooms"></div>
+            <li></li>
+          </ul>
+        </div>
+      <hr>
       </div>
-    </form>
-
-  <br/>
-
-  </section>
+    </div>
   </div>
 </div>
 
@@ -85,6 +89,15 @@
   var socket = io();
 
   var name = "";
+
+  function changeTitle(rName){
+    var title = document.getElementById('RoomName');
+//    console.log("the new room name is ", rName);
+//    console.log("The title is ", title);
+    title.innerHTML =rName;
+
+
+  }
 
   var createRoom= function(){
     var roomName = $("#custom-room-name").val();
@@ -114,13 +127,14 @@
   $('.roomButton').click(function() {
       var rName = $(this).val();
       switchRoom(rName);
+      changeTitle(rName);
     }
   ); // this means we check the current selected element (so this case we are getting the value which was defined in the input tag)
 
   socket.on('users', function(users){// listen for when someone is connected to the server the users nickname
     for(i = users.length; i > -1; i--) {
       $('#user').append($('<div>').text(users[i]));
-      //socket.emit('username', username[i]);
+//      socket.emit('username', users[i]);
     }
     name = prompt('What is your name?');
     socket.emit('join', name); //notifies the server of new user
@@ -137,16 +151,28 @@
     };
     socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
     var msg = $('#m').val();
+    var audio = new Audio('/styles/upvote.wav');
+    audio.play();
+
     $('#m').val(''); // this is to clear the msg bar
     return false;
   });
+
   socket.on('chat message', function(msg) {
+//    var audio = new Audio('/styles/receive.wav');
+//    audio.play();
+
     $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
     $('#messages').animate({
       scrollTop: $('#messages').height()
     }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
-    console.log(msg);
+    console.log('the chat: ', msg);
+
+//    socket.broadcast.to('play', audio.play());
+
+
   });
+
   socket.on('joined', function(username){
     $('#user').append($('<div>').text(username));
    /* $('#user').html(" "); //this clears the html in the user element and reloads :)
