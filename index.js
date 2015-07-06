@@ -93,8 +93,8 @@ io.on('connection', function(socket){ // then listen to the connection event for
 	socket.on('chat message', function(msg){
 		console.log('the message is: ' + msg);
     console.log('sound');
-    var audio = "sound";
-    socket.emit('play', audio);
+
+    socket.broadcast.emit('play');
 
 		io.to(room).emit('chat message', msg);
 		client.lpush('history' + room, msg, function(err, history){
@@ -106,9 +106,7 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		client.lrem('username', 1, currentUsername);// remove the client that is disconnecting
 		client.lrange('username', 0, -1, function(err, username){ // reprint the list to account for the person that disconnected
 			io.to(room).emit('username', username);
-			//socket.broadcast.emit('username', username);
 			console.log("the current users are: ", username);
-			//socket.emit('username', username);
 		});
 		userCount = userCount-1;
 		console.log("Someone disconnected there are", userCount, "users");// if there is a disconnection, log it to the console.

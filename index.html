@@ -91,12 +91,8 @@
   var name = "";
 
   function changeTitle(rName){
-    var title = document.getElementById('RoomName');
-//    console.log("the new room name is ", rName);
-//    console.log("The title is ", title);
+    var title = document.getElementById('RoomName')
     title.innerHTML =rName;
-
-
   }
 
   var createRoom= function(){
@@ -134,7 +130,7 @@
   socket.on('users', function(users){// listen for when someone is connected to the server the users nickname
     for(i = users.length; i > -1; i--) {
       $('#user').append($('<div>').text(users[i]));
-//      socket.emit('username', users[i]);
+
     }
     name = prompt('What is your name?');
     socket.emit('join', name); //notifies the server of new user
@@ -149,6 +145,9 @@
     }else{
       date = date.getHours() + ":" + date.getMinutes();
     };
+
+
+
     socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
     var msg = $('#m').val();
     var audio = new Audio('/styles/upvote.wav');
@@ -159,8 +158,6 @@
   });
 
   socket.on('chat message', function(msg) {
-//    var audio = new Audio('/styles/receive.wav');
-//    audio.play();
 
     $('#messages').append($('<li>').text(msg));//['name']+ " (" + msg["date"] + "): " + msg['msg']));// submits msgs into the box and puts them below previous statements.
     $('#messages').animate({
@@ -168,19 +165,18 @@
     }, "slow"); // need to find out how to scroll bottom (hint: its not scrollBottom)
     console.log('the chat: ', msg);
 
-//    socket.broadcast.to('play', audio.play());
+  });
 
-
+  socket.on('play', function(){
+    console.log('in play function');
+    var sound = new Audio('/styles/receive.wav');
+    sound.play()
   });
 
   socket.on('joined', function(username){
     $('#user').append($('<div>').text(username));
-   /* $('#user').html(" "); //this clears the html in the user element and reloads :)
-    for(i = username.length; i > -1; i--) {
-      $('#user').append($('<div>').text(username[i]));
-      //socket.emit('username', username[i]);
-    };*/
   });
+
   socket.on('history', function(msgs){
     $('#messages').html(" ");
     if (msgs === null){
