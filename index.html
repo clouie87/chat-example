@@ -26,7 +26,7 @@
           <ul id="user"> </ul>
         </div>
 
-        <div class="col m6"><br><h5 id ="RoomName" class="center" value="General">General</h5>
+        <div class="col m6"><br><h5 id ="RoomName" class="center">General</h5>
 
         <hr>
           <section>
@@ -43,7 +43,9 @@
                   <button class="waves-effect waves-light btn send right">Send</button>
                 </div>
               </div>
+              <div class="typing"></div>
             </form>
+
 
             <br/>
 
@@ -67,6 +69,8 @@
 
             <br/>
             <!--<li><input type="button" id="create-room" class= 'createButton' onclick="createRoom()" value="Create Room"/></li>-->
+            <li><input type="button" id= "general" class= 'roomButton' value="General" /></li>
+
             <li><input type="button" id= "newPartner" class= 'roomButton' value="Find a Partner" /></li>
             <li><input type="button" id="equipment" class= 'roomButton' value="Find Equipment" /> </li>
             <li><input type="button" id="carShare" class= 'roomButton' value ="Find a Ride" /></li>
@@ -89,9 +93,10 @@
   var socket = io();
 
   var name = "";
+  var roomName = "General";
 
   function changeTitle(rName){
-    var title = document.getElementById('RoomName')
+    var title = document.getElementById('RoomName');
     title.innerHTML =rName;
   }
 
@@ -112,6 +117,21 @@
 
     $('#custom-rooms').append($('<li>').append(roomBtn));
   });
+
+  socket.on('newRoom', function(room){
+    for(j = room.length; j > -1; j++) {
+      var roomBtn = $('<input class="roomButton">');
+      roomBtn.val(room[i]);
+      roomBtn.attr("type","button");
+
+      $('#custom-rooms').append($('<li>').append(roomBtn));
+    }
+  });
+
+//  socket.on('newRoom', function(room){
+////    $('#custom-rooms').append($('<li>').append("New"));
+//    console.log("the room is", room);
+//  });
 
   var room = io.connect('/room');
 
@@ -144,10 +164,7 @@
       date = date.getHours() + ":0" + date.getMinutes();
     }else{
       date = date.getHours() + ":" + date.getMinutes();
-    };
-
-
-
+    }
     socket.emit('chat message', name+ " " + date + ": " + $('#m').val());
     var msg = $('#m').val();
     var audio = new Audio('/styles/upvote.wav');
@@ -156,6 +173,39 @@
     $('#m').val(''); // this is to clear the msg bar
     return false;
   });
+
+
+  var typingTimer;                //timer identifier
+  var doneTypingInterval = 5000;  //time in ms, 5 second for example
+
+  $('#m').keyup(function() {
+
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    console.log('we can print the user is typing');
+
+    function doneTyping(){
+      var v = "empty";
+      $('.typing').html(v);
+    }
+
+    $('#m').keydown(function(){
+      var v = "user is typing";
+      $('.typing').html(v);
+
+    });
+
+  });
+
+
+
+
+//  socket.on('changed', function(name){
+//    var v = name + " is typing";
+//    $('.typing').html(v);
+//  socket.emit('change', name);
+//  console.log(name, 'Changed!');
+//  });
 
   socket.on('chat message', function(msg) {
 
@@ -176,6 +226,8 @@
   socket.on('joined', function(username){
     $('#user').append($('<div>').text(username));
   });
+
+
 
   socket.on('history', function(msgs){
     $('#messages').html(" ");

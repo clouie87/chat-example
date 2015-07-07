@@ -30,6 +30,17 @@ h4 {
 
 }
 
+
+.typing{
+  margin-top: -33px;
+  float: left;
+  margin-left: 30px;
+  font-size: 11px;
+  font-weight: bolder;
+  color:black;
+
+}
+
 /*.col .m6 {*/
   /**/
 /*}*/
@@ -78,6 +89,10 @@ p{
     background-color: transparent;
 
 	}
+
+  .row .col.s12{
+    margin-top: -10px;
+  }
 
   ul.createRoom{
     float:left;

@@ -35,7 +35,7 @@ app.use('/scripts', express.static(__dirname +'/scripts'));
 
 
 io.on('connection', function(socket){ // then listen to the connection event for incoming sockets
-	var room = '';
+	var room = 'General';
 
 	userCount = userCount+1;
 	var currentUsername = "";
@@ -59,12 +59,25 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		});
 
 
+
+
 // in redis we will keep the history plus the room name so that we know which room the msg was sent from and can send back to newUsers on connection
 		client.lrange('history'+ room, 0, 9, function(err, history){ // when a new client joins we want to print the history
 			console.log("history: " + room, history);
 			socket.emit('history', history); // emit it to all users (but will only be sent to the new connection!)
 		});//socket.emit goes only to the user connected so we dont need to use to(room) because we dont care which room he is in, regardless he needs the history
+
+    //client.lrange('rooms', 0, -1, function(err, room){
+    //  console.log("rooms", room);
+    //  socket.emit('newRoom', room);
+    //})
+
 	});
+
+  socket.on('change', function(name){
+    console.log('changed, ', name);
+    socket.broadcast.emit('changed', name)
+  });
 
 	socket.on("createRoom", function(roomName){
 		console.log("roomName has been created:", roomName);
@@ -72,6 +85,12 @@ io.on('connection', function(socket){ // then listen to the connection event for
 		socket.leave(room);
 		room = roomName;
 		io.emit("createdRoom", room);
+    //var rooms = "room"+room;
+    //client.lpush("rooms", room, function(err, length){
+    //  console.log(length);
+    //  console.log("room name", room);
+    //  socket.emit('rooms', room);
+    //});
 	});
 
 	socket.on('switchRoom', function(newRoom){ //listen for switching of rooms
@@ -98,7 +117,7 @@ io.on('connection', function(socket){ // then listen to the connection event for
 
 		io.to(room).emit('chat message', msg);
 		client.lpush('history' + room, msg, function(err, history){
-			console.log(history);
+			console.log('the history is', history);
 		}); //to store the message
 	}); // this will print it to the console... but we want to print it to the page! (broadcast it to the users)
 
